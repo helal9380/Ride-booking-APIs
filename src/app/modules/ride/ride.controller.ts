@@ -96,6 +96,18 @@ const getAllRides = catchAsync(
     });
   }
 );
+const approveDriver = catchAsync(
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  async (req: Request, res: Response, next: NextFunction) => {
+    await RideService.approveDriver(req.params.id);
+    sendResponse(res, {
+      success: true,
+      message: "Approved successfully",
+      data: null,
+      statusCode: httpStatusCode.OK,
+    });
+  }
+);
 
 export const RideContorller = {
   requestRide,
@@ -105,4 +117,5 @@ export const RideContorller = {
   getMyRides,
   getDriverEarnings,
   getAllRides,
+  approveDriver,
 };

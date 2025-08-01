@@ -2,6 +2,7 @@
 
 import httStatus from "http-status-codes";
 import AppEror from "../../errorHelpers/appError";
+import { Role } from "../user/user.interface";
 import { User } from "../user/user.model";
 import { IRequestRide, RideStatus } from "./ride.interface";
 import { Ride } from "./ride.model";
@@ -20,15 +21,12 @@ const requestRide = async (req: any, payload: Partial<IRequestRide>) => {
 };
 const cancelRide = async (req: any, payload: Partial<IRequestRide>) => {
   const ride = await Ride.findById(req.params.id);
-  if (!ride) {
+  if (!ride || ride.rider !== req.user!.userId) {
     throw new AppEror(httStatus.BAD_REQUEST, "Ride not found!");
-  }
-  if (ride.rider === req.user?.userId) {
-    throw new AppEror(httStatus.FORBIDDEN, "Forbidden");
   }
 
   if (ride.status !== RideStatus.REQUESTED) {
-    throw new AppEror(httStatus.BAD_REQUEST, "Can not cancel now!");
+    throw new AppEror(httStatus.BAD_REQUEST, "Cannot cancel after acceptance!");
   }
 
   ride.status = RideStatus.CANCELED;
@@ -105,6 +103,7 @@ const getMyRides = async (req: any) => {
   }
   return rides;
 };
+
 const getDriverEarnings = async (req: any) => {
   const rides = await Ride.find({
     driver: req.user!.userId,
@@ -125,6 +124,19 @@ const getAllRides = async () => {
   return rides;
 };
 
+// approve driver
+const approveDriver = async (driverId: string) => {
+  const driver = await User.findById(driverId);
+  if (!driver) {
+    throw new AppEror(httStatus.BAD_REQUEST, "Driver not found!.");
+  }
+
+  driver.approved = !driver.approved;
+  driver.role = driver.approved ? Role.DRIVER : Role.RIDER;
+  await driver.save();
+  return;
+};
+
 export const RideService = {
   requestRide,
   cancelRide,
@@ -133,4 +145,5 @@ export const RideService = {
   getMyRides,
   getDriverEarnings,
   getAllRides,
+  approveDriver,
 };

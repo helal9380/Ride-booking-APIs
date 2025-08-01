@@ -2,6 +2,7 @@
 
 import { model, Schema } from "mongoose";
 import { IAuthProvider, IUser, Role } from "./user.interface";
+
 const authProviderSchema = new Schema<IAuthProvider>(
   {
     providerId: { type: String, required: true },
@@ -22,6 +23,7 @@ const userSchema = new Schema<IUser>({
   isBlocked: { type: Boolean, default: false },
   approved: { type: Boolean, default: false },
   isOnline: { type: Boolean, default: false },
+  auths: [authProviderSchema],
 });
 
 // pre hook
