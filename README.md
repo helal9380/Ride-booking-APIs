@@ -50,8 +50,43 @@ src/
 
 ### 1. Auth
 
-- **Method post:** /api/auth/register
-- **Method post:** /api/auth/login
+- **Method POST:** /api/auth/register **Description:** Register rider/driver default: rider
+- **Method POST:** /api/auth/login **Description:** Login & get JWT token
+
+### 2. Rider
+
+- **Method POST:** /api/rides/request **Description:** Request a ride
+- **Method PATCH:** /api/rides/:id/cancel **Description:** Cancel a ride
+- **Method GET:** /api/rides/me **Description:** View rider's ride history
+
+### 3. Driver
+
+- **Method PATCH:** /api/rides/:id/accept **Description:** Accept a ride
+- **Method PATCH:** /api/rides/:id/status **Description:** Update ride status
+- **Method GET:** /api/rides/earnings **Description:** View total earnings history
+
+### 4. Admin
+
+- **Method GET:** /api/users **Description:** View all users
+- **Method PATCH:** /api/drivers/:id/approve **Description:** Approve a driver
+- **Method GET:** /api/rides **Description:** View all rides in the system
+
+## Ride Lifecycle
+
+- **requested** → (accepted by driver) → **accepted**
+- **accepted** → pickedup → inTransit → **completed**
+- **requested** → (cancelled by rider) → **cancelled**
+- **Each transition logs a timestamp:**
+  requestedAt, acceptedAt, pickedUpAt, inTransitAt, completedAt, cancelledAt
+
+## Role-Based Protection
+
+- **Riders:** /api/rides/request, /cancel, /me
+
+- **Drivers:** /accept, /status, /earnings
+
+- **Admins:** /users, /approve, /rides
+- **All protected by JWT and middleware checkAuth(role).**
 
 ## Getting Started
 
@@ -72,3 +107,9 @@ JWT_SECRET=your_secret
 ## Run Locally
 
 npm run dev
+
+## Author
+
+- **Asadur Rahman**
+  Frontend Developer
+  Thank you
