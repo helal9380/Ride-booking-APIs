@@ -108,6 +108,16 @@ JWT_SECRET=your_secret
 
 npm run dev
 
+## Postman Collection
+
+- A full Postman collection with:
+- Auth flow (Register, Login)
+- Rider ride request & cancel
+- Driver ride accept & status update
+- Admin approve/ get rides/ users
+
+📥 Visit [Postman api](https://web.postman.co/workspace/My-Workspace~2b7f8520-d4fb-4fae-8518-c581a210a53e/collection/45794228-7bcefccd-9ee8-4067-b3c0-69b56141e760?action=share&source=copy-link&creator=45794228) for getting all APIs.
+
 ## Author
 
 - **Asadur Rahman**
