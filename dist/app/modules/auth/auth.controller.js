@@ -42,7 +42,7 @@ const credentialsLogin = (0, catchAsync_1.catchAsync)(
         success: true,
         message: "User login successfully",
         data: loginInfo,
-        statusCode: http_status_codes_1.default.CREATED,
+        statusCode: http_status_codes_1.default.OK,
     });
 }));
 const getRefreshToken = (0, catchAsync_1.catchAsync)(

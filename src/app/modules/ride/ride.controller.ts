@@ -43,6 +43,18 @@ const acceptRide = catchAsync(
     });
   }
 );
+const rejectRideRequest = catchAsync(
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  async (req: Request, res: Response, next: NextFunction) => {
+    await RideService.acceptRide(req);
+    sendResponse(res, {
+      success: true,
+      message: "Ride rejected successfully",
+      data: null,
+      statusCode: httpStatusCode.OK,
+    });
+  }
+);
 const updateRideStatus = catchAsync(
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   async (req: Request, res: Response, next: NextFunction) => {
@@ -96,6 +108,18 @@ const getAllRides = catchAsync(
     });
   }
 );
+const getAssignedRides = catchAsync(
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  async (req: Request, res: Response, next: NextFunction) => {
+    const rides = await RideService.getAssignedRides(req);
+    sendResponse(res, {
+      success: true,
+      message: "All rides retrieved successfully",
+      data: rides,
+      statusCode: httpStatusCode.OK,
+    });
+  }
+);
 const approveDriver = catchAsync(
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   async (req: Request, res: Response, next: NextFunction) => {
@@ -118,4 +142,6 @@ export const RideContorller = {
   getDriverEarnings,
   getAllRides,
   approveDriver,
+  getAssignedRides,
+  rejectRideRequest,
 };

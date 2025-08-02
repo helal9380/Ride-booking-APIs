@@ -16,6 +16,7 @@ router.post(
   RideContorller.requestRide
 );
 router.get("/me", checkAuth(Role.RIDER), RideContorller.getMyRides);
+router.get("/rides", checkAuth(Role.DRIVER), RideContorller.getAssignedRides);
 router.get("/", checkAuth(Role.ADMIN), RideContorller.getAllRides);
 router.get(
   "/earnings",
@@ -29,6 +30,11 @@ router.patch(
   RideContorller.cancelRide
 );
 router.patch("/:id/accept", checkAuth(Role.DRIVER), RideContorller.acceptRide);
+router.patch(
+  "/:id/reject",
+  checkAuth(Role.DRIVER),
+  RideContorller.rejectRideRequest
+);
 router.patch(
   "/:id/approve",
   checkAuth(Role.ADMIN),

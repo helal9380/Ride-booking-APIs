@@ -33,7 +33,7 @@ const credentialsLogin = catchAsync(
       success: true,
       message: "User login successfully",
       data: loginInfo,
-      statusCode: httpStatus.CREATED,
+      statusCode: httpStatus.OK,
     });
   }
 );

@@ -13,7 +13,7 @@ const getAllUsers = catchAsync(
 
     sendResponse(res, {
       success: true,
-      message: "All users retrieved successfully",
+      message: "All users (drivers, riders) retrieved successfully",
       statusCode: httpStatusCode.OK,
       meta: result.meta,
       data: result.data,

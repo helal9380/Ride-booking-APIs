@@ -67,15 +67,26 @@ const cancelRide = async (req: any) => {
 const acceptRide = async (req: any) => {
   const ride = await Ride.findById(req.params.id);
   if (!ride || ride.status !== RideStatus.REQUESTED) {
-    throw new AppEror(httStatus.BAD_REQUEST, "Invalid ride!");
+    throw new AppEror(httStatus.BAD_REQUEST, "Invalid ride or ride not found!");
   }
   const driver = await User.findById(req.user!.userId);
 
-  if (!driver?.isOnline) {
-    throw new AppEror(httStatus.BAD_REQUEST, "Driver must be online.");
+  if (
+    !driver ||
+    driver.role !== Role.DRIVER ||
+    !driver.approved ||
+    !driver.isOnline
+  ) {
+    throw new AppEror(
+      httStatus.BAD_REQUEST,
+      "You are not allowed to accept this ride."
+    );
   }
-  if (driver?.isBlocked) {
-    throw new AppEror(httStatus.BAD_REQUEST, "Driver is blocked by admin.");
+  if (ride.status !== "requested") {
+    throw new AppEror(
+      httStatus.BAD_REQUEST,
+      "Ride already accepted or unavailable."
+    );
   }
 
   const activeRide = await Ride.findOne({
@@ -93,6 +104,31 @@ const acceptRide = async (req: any) => {
   ride.status = RideStatus.ACCEPTED;
   ride.driver = req.user!.userId;
   ride.timestamps.acceptedAt = new Date();
+  await ride.save();
+  return;
+};
+const rejectRideRequest = async (req: any) => {
+  const ride = await Ride.findById(req.params.id);
+  if (!ride || ride.status !== RideStatus.ACCEPTED) {
+    throw new AppEror(httStatus.BAD_REQUEST, "Ride not available to reject.");
+  }
+  const driver = await User.findById(req.user!.userId);
+
+  if (
+    !driver ||
+    driver.role !== Role.DRIVER ||
+    !driver.approved ||
+    !driver.isOnline
+  ) {
+    throw new AppEror(
+      httStatus.BAD_REQUEST,
+      "You are not allowed to reject this ride."
+    );
+  }
+
+  ride.status = RideStatus.REQUESTED;
+  ride.driver = undefined;
+  ride.timestamps.cancelledAt = new Date();
   await ride.save();
   return;
 };
@@ -135,6 +171,30 @@ const getMyRides = async (req: any) => {
   if (!rides) {
     throw new AppEror(httStatus.BAD_REQUEST, "Ride not found!");
   }
+  return rides;
+};
+const getAssignedRides = async (req: any) => {
+  const driverId = req.user?.userId;
+
+  if (!driverId) {
+    throw new AppEror(httStatus.BAD_REQUEST, "No driver found!");
+  }
+
+  const rides = await Ride.find({
+    driver: driverId,
+    status: {
+      $in: [
+        RideStatus.ACCEPTED,
+        RideStatus.PICKED_UP,
+        RideStatus.IN_TRANSIT,
+        RideStatus.COMPLETED,
+      ],
+    },
+  });
+  if (!rides) {
+    throw new AppEror(httStatus.BAD_REQUEST, "Not ride found!");
+  }
+
   return rides;
 };
 
@@ -180,4 +240,6 @@ export const RideService = {
   getDriverEarnings,
   getAllRides,
   approveDriver,
+  getAssignedRides,
+  rejectRideRequest,
 };

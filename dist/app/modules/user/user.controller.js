@@ -24,7 +24,7 @@ const getAllUsers = (0, catchAsync_1.catchAsync)(
     const result = yield user_service_1.UserService.getAllUser();
     (0, sendResponse_1.sendResponse)(res, {
         success: true,
-        message: "All users retrieved successfully",
+        message: "All users (drivers, riders) retrieved successfully",
         statusCode: http_status_codes_1.default.OK,
         meta: result.meta,
         data: result.data,

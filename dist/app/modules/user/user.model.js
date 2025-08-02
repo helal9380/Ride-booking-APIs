@@ -9,8 +9,8 @@ const authProviderSchema = new mongoose_1.Schema({
     provider: { type: String, required: true },
 }, { _id: false, versionKey: false });
 const userSchema = new mongoose_1.Schema({
-    name: String,
-    email: { type: String, unique: true },
+    name: { type: String, trim: true },
+    email: { type: String, unique: true, lowercase: true },
     password: String,
     role: {
         type: String,

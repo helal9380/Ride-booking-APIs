@@ -72,14 +72,17 @@ const cancelRide = (req) => __awaiter(void 0, void 0, void 0, function* () {
 const acceptRide = (req) => __awaiter(void 0, void 0, void 0, function* () {
     const ride = yield ride_model_1.Ride.findById(req.params.id);
     if (!ride || ride.status !== ride_interface_1.RideStatus.REQUESTED) {
-        throw new appError_1.default(http_status_codes_1.default.BAD_REQUEST, "Invalid ride!");
+        throw new appError_1.default(http_status_codes_1.default.BAD_REQUEST, "Invalid ride or ride not found!");
     }
     const driver = yield user_model_1.User.findById(req.user.userId);
-    if (!(driver === null || driver === void 0 ? void 0 : driver.isOnline)) {
-        throw new appError_1.default(http_status_codes_1.default.BAD_REQUEST, "Driver must be online.");
+    if (!driver ||
+        driver.role !== user_interface_1.Role.DRIVER ||
+        !driver.approved ||
+        !driver.isOnline) {
+        throw new appError_1.default(http_status_codes_1.default.BAD_REQUEST, "You are not allowed to accept this ride.");
     }
-    if (driver === null || driver === void 0 ? void 0 : driver.isBlocked) {
-        throw new appError_1.default(http_status_codes_1.default.BAD_REQUEST, "Driver is blocked by admin.");
+    if (ride.status !== "requested") {
+        throw new appError_1.default(http_status_codes_1.default.BAD_REQUEST, "Ride already accepted or unavailable.");
     }
     const activeRide = yield ride_model_1.Ride.findOne({
         driver: req.user.userId,
@@ -91,6 +94,24 @@ const acceptRide = (req) => __awaiter(void 0, void 0, void 0, function* () {
     ride.status = ride_interface_1.RideStatus.ACCEPTED;
     ride.driver = req.user.userId;
     ride.timestamps.acceptedAt = new Date();
+    yield ride.save();
+    return;
+});
+const rejectRideRequest = (req) => __awaiter(void 0, void 0, void 0, function* () {
+    const ride = yield ride_model_1.Ride.findById(req.params.id);
+    if (!ride || ride.status !== ride_interface_1.RideStatus.ACCEPTED) {
+        throw new appError_1.default(http_status_codes_1.default.BAD_REQUEST, "Ride not available to reject.");
+    }
+    const driver = yield user_model_1.User.findById(req.user.userId);
+    if (!driver ||
+        driver.role !== user_interface_1.Role.DRIVER ||
+        !driver.approved ||
+        !driver.isOnline) {
+        throw new appError_1.default(http_status_codes_1.default.BAD_REQUEST, "You are not allowed to reject this ride.");
+    }
+    ride.status = ride_interface_1.RideStatus.REQUESTED;
+    ride.driver = undefined;
+    ride.timestamps.cancelledAt = new Date();
     yield ride.save();
     return;
 });
@@ -125,6 +146,28 @@ const getMyRides = (req) => __awaiter(void 0, void 0, void 0, function* () {
     });
     if (!rides) {
         throw new appError_1.default(http_status_codes_1.default.BAD_REQUEST, "Ride not found!");
+    }
+    return rides;
+});
+const getAssignedRides = (req) => __awaiter(void 0, void 0, void 0, function* () {
+    var _a;
+    const driverId = (_a = req.user) === null || _a === void 0 ? void 0 : _a.userId;
+    if (!driverId) {
+        throw new appError_1.default(http_status_codes_1.default.BAD_REQUEST, "No driver found!");
+    }
+    const rides = yield ride_model_1.Ride.find({
+        driver: driverId,
+        status: {
+            $in: [
+                ride_interface_1.RideStatus.ACCEPTED,
+                ride_interface_1.RideStatus.PICKED_UP,
+                ride_interface_1.RideStatus.IN_TRANSIT,
+                ride_interface_1.RideStatus.COMPLETED,
+            ],
+        },
+    });
+    if (!rides) {
+        throw new appError_1.default(http_status_codes_1.default.BAD_REQUEST, "Not ride found!");
     }
     return rides;
 });
@@ -163,4 +206,6 @@ exports.RideService = {
     getDriverEarnings,
     getAllRides,
     approveDriver,
+    getAssignedRides,
+    rejectRideRequest,
 };
