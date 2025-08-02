@@ -107,31 +107,7 @@ const acceptRide = async (req: any) => {
   await ride.save();
   return;
 };
-const rejectRideRequest = async (req: any) => {
-  const ride = await Ride.findById(req.params.id);
-  if (!ride || ride.status !== RideStatus.ACCEPTED) {
-    throw new AppEror(httStatus.BAD_REQUEST, "Ride not available to reject.");
-  }
-  const driver = await User.findById(req.user!.userId);
 
-  if (
-    !driver ||
-    driver.role !== Role.DRIVER ||
-    !driver.approved ||
-    !driver.isOnline
-  ) {
-    throw new AppEror(
-      httStatus.BAD_REQUEST,
-      "You are not allowed to reject this ride."
-    );
-  }
-
-  ride.status = RideStatus.REQUESTED;
-  ride.driver = undefined;
-  ride.timestamps.cancelledAt = new Date();
-  await ride.save();
-  return;
-};
 const updateRideStatus = async (req: any) => {
   const ride = await Ride.findById(req.params.id);
   if (!ride) {
@@ -241,5 +217,4 @@ export const RideService = {
   getAllRides,
   approveDriver,
   getAssignedRides,
-  rejectRideRequest,
 };

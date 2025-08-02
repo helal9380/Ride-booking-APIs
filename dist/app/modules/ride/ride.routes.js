@@ -16,7 +16,6 @@ router.get("/", (0, checkAuth_1.checkAuth)(user_interface_1.Role.ADMIN), ride_co
 router.get("/earnings", (0, checkAuth_1.checkAuth)(user_interface_1.Role.DRIVER), ride_controller_1.RideContorller.getDriverEarnings);
 router.patch("/:id/cancel", (0, checkAuth_1.checkAuth)(user_interface_1.Role.RIDER), ride_controller_1.RideContorller.cancelRide);
 router.patch("/:id/accept", (0, checkAuth_1.checkAuth)(user_interface_1.Role.DRIVER), ride_controller_1.RideContorller.acceptRide);
-router.patch("/:id/reject", (0, checkAuth_1.checkAuth)(user_interface_1.Role.DRIVER), ride_controller_1.RideContorller.rejectRideRequest);
 router.patch("/:id/approve", (0, checkAuth_1.checkAuth)(user_interface_1.Role.ADMIN), ride_controller_1.RideContorller.approveDriver);
 router.patch("/:id/status", (0, checkAuth_1.checkAuth)(user_interface_1.Role.DRIVER), ride_controller_1.RideContorller.updateRideStatus);
 exports.RidesRoutes = router;

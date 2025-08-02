@@ -43,18 +43,7 @@ const acceptRide = catchAsync(
     });
   }
 );
-const rejectRideRequest = catchAsync(
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  async (req: Request, res: Response, next: NextFunction) => {
-    await RideService.acceptRide(req);
-    sendResponse(res, {
-      success: true,
-      message: "Ride rejected successfully",
-      data: null,
-      statusCode: httpStatusCode.OK,
-    });
-  }
-);
+
 const updateRideStatus = catchAsync(
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   async (req: Request, res: Response, next: NextFunction) => {
@@ -143,5 +132,4 @@ export const RideContorller = {
   getAllRides,
   approveDriver,
   getAssignedRides,
-  rejectRideRequest,
 };

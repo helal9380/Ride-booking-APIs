@@ -52,17 +52,6 @@ const acceptRide = (0, catchAsync_1.catchAsync)(
         statusCode: http_status_codes_1.default.OK,
     });
 }));
-const rejectRideRequest = (0, catchAsync_1.catchAsync)(
-// eslint-disable-next-line @typescript-eslint/no-unused-vars
-(req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
-    yield ride_service_1.RideService.acceptRide(req);
-    (0, sendResponse_1.sendResponse)(res, {
-        success: true,
-        message: "Ride rejected successfully",
-        data: null,
-        statusCode: http_status_codes_1.default.OK,
-    });
-}));
 const updateRideStatus = (0, catchAsync_1.catchAsync)(
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 (req, res, next) => __awaiter(void 0, void 0, void 0, function* () {
@@ -142,5 +131,4 @@ exports.RideContorller = {
     getAllRides,
     approveDriver,
     getAssignedRides,
-    rejectRideRequest,
 };

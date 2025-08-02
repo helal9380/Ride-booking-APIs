@@ -97,24 +97,6 @@ const acceptRide = (req) => __awaiter(void 0, void 0, void 0, function* () {
     yield ride.save();
     return;
 });
-const rejectRideRequest = (req) => __awaiter(void 0, void 0, void 0, function* () {
-    const ride = yield ride_model_1.Ride.findById(req.params.id);
-    if (!ride || ride.status !== ride_interface_1.RideStatus.ACCEPTED) {
-        throw new appError_1.default(http_status_codes_1.default.BAD_REQUEST, "Ride not available to reject.");
-    }
-    const driver = yield user_model_1.User.findById(req.user.userId);
-    if (!driver ||
-        driver.role !== user_interface_1.Role.DRIVER ||
-        !driver.approved ||
-        !driver.isOnline) {
-        throw new appError_1.default(http_status_codes_1.default.BAD_REQUEST, "You are not allowed to reject this ride.");
-    }
-    ride.status = ride_interface_1.RideStatus.REQUESTED;
-    ride.driver = undefined;
-    ride.timestamps.cancelledAt = new Date();
-    yield ride.save();
-    return;
-});
 const updateRideStatus = (req) => __awaiter(void 0, void 0, void 0, function* () {
     var _a;
     const ride = yield ride_model_1.Ride.findById(req.params.id);
@@ -207,5 +189,4 @@ exports.RideService = {
     getAllRides,
     approveDriver,
     getAssignedRides,
-    rejectRideRequest,
 };

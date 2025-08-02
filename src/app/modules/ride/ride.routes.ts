@@ -30,11 +30,7 @@ router.patch(
   RideContorller.cancelRide
 );
 router.patch("/:id/accept", checkAuth(Role.DRIVER), RideContorller.acceptRide);
-router.patch(
-  "/:id/reject",
-  checkAuth(Role.DRIVER),
-  RideContorller.rejectRideRequest
-);
+
 router.patch(
   "/:id/approve",
   checkAuth(Role.ADMIN),
