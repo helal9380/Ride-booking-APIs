@@ -21,11 +21,25 @@ const user_model_1 = require("../user/user.model");
 const ride_interface_1 = require("./ride.interface");
 const ride_model_1 = require("./ride.model");
 const requestRide = (req, payload) => __awaiter(void 0, void 0, void 0, function* () {
-    var _a;
+    var _a, _b;
     const { pickup, destination } = payload;
-    //   console.log(req.user);
+    const userId = (_a = req.user) === null || _a === void 0 ? void 0 : _a.userId;
+    const exisingRide = yield ride_model_1.Ride.findOne({
+        rider: userId,
+        status: {
+            $in: [
+                ride_interface_1.RideStatus.ACCEPTED,
+                ride_interface_1.RideStatus.IN_TRANSIT,
+                ride_interface_1.RideStatus.PICKED_UP,
+                ride_interface_1.RideStatus.REQUESTED,
+            ],
+        },
+    });
+    if (exisingRide) {
+        throw new appError_1.default(http_status_codes_1.default.BAD_REQUEST, "You already have an active ride. Complete or cancel it before requesting a new one.");
+    }
     const ride = yield ride_model_1.Ride.create({
-        rider: (_a = req.user) === null || _a === void 0 ? void 0 : _a.userId,
+        rider: (_b = req.user) === null || _b === void 0 ? void 0 : _b.userId,
         pickup,
         destination,
         status: ride_interface_1.RideStatus.REQUESTED,
