@@ -20,7 +20,34 @@ const getAllUsers = catchAsync(
     });
   }
 );
+const updateOnlineStatus = catchAsync(
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  async (req: Request, res: Response, next: NextFunction) => {
+    const result = await UserService.updateOnlineStatus(req.params.id);
+
+    sendResponse(res, {
+      success: true,
+      message: "Driver is online now!",
+      statusCode: httpStatusCode.OK,
+      data: result.data,
+    });
+  }
+);
+const userBlocked = catchAsync(
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  async (req: Request, res: Response, next: NextFunction) => {
+    const user = await UserService.userBlocked(req.params.id);
+    sendResponse(res, {
+      success: true,
+      message: "User is blocked now!",
+      statusCode: httpStatusCode.OK,
+      data: user,
+    });
+  }
+);
 
 export const UserContorller = {
   getAllUsers,
+  updateOnlineStatus,
+  userBlocked,
 };

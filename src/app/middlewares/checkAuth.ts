@@ -46,7 +46,7 @@ export const checkAuth =
       if (!authRest.includes(varifiedToken.role)) {
         throw new AppEror(
           StatusCodes.BAD_REQUEST,
-          "You are not permited to view this route."
+          "You are not permited to view this route. or invalid token!"
         );
       }
 

@@ -22,7 +22,7 @@ const requestRide = catchAsync(
 const cancelRide = catchAsync(
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
   async (req: Request, res: Response, next: NextFunction) => {
-    await RideService.cancelRide(req, req.body);
+    await RideService.cancelRide(req);
     sendResponse(res, {
       success: true,
       message: "Ride cancel successfully",

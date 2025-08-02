@@ -12,5 +12,11 @@ router.get(
   checkAuth(Role.ADMIN, Role.SUPER_ADMIN),
   UserContorller.getAllUsers
 );
+router.patch(
+  "/:id/online",
+  checkAuth(Role.DRIVER),
+  UserContorller.updateOnlineStatus
+);
+router.patch("/:id/block", checkAuth(Role.ADMIN), UserContorller.userBlocked);
 
 export const UserRoutes = router;

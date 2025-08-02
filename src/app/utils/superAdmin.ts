@@ -1,6 +1,7 @@
 /** @format */
 
 import bcryptjs from "bcryptjs";
+import { Types } from "mongoose";
 import { envVars } from "../config/env";
 import { IAuthProvider, IUser, Role } from "../modules/user/user.interface";
 import { User } from "../modules/user/user.model";
@@ -27,12 +28,12 @@ export const superAdmin = async () => {
     };
 
     const payload: IUser = {
+      _id: new Types.ObjectId(),
       name: "Super Admin",
       email: envVars.SUPER_ADMIN_EMAIL,
       password: hasPassword,
       role: Role.SUPER_ADMIN,
       auths: [authProvider],
-      isVarified: true,
     };
 
     await User.create(payload);

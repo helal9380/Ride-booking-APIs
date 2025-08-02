@@ -19,9 +19,10 @@ const requestRide = async (req: any, payload: Partial<IRequestRide>) => {
   });
   return ride;
 };
-const cancelRide = async (req: any, payload: Partial<IRequestRide>) => {
+const cancelRide = async (req: any) => {
   const ride = await Ride.findById(req.params.id);
-  if (!ride || ride.rider !== req.user!.userId) {
+
+  if (!ride || ride?.rider.toString() !== req.user!.userId) {
     throw new AppEror(httStatus.BAD_REQUEST, "Ride not found!");
   }
 
@@ -29,6 +30,16 @@ const cancelRide = async (req: any, payload: Partial<IRequestRide>) => {
     throw new AppEror(httStatus.BAD_REQUEST, "Cannot cancel after acceptance!");
   }
 
+  // Check cancellation window
+  const now = new Date();
+  const requestdTime = ride.timestamps?.requestedAt;
+  const diffInMinutes = (now.getTime() - requestdTime.getTime()) / (1000 * 60);
+
+  if (diffInMinutes > 5) {
+    throw new AppEror(httStatus.BAD_REQUEST, "Cancellation window expired.");
+  }
+
+  // updated ride status (ride status canceled)
   ride.status = RideStatus.CANCELED;
   ride.timestamps.cancelledAt = new Date();
   await ride.save();
@@ -44,11 +55,15 @@ const acceptRide = async (req: any) => {
   if (!driver?.isOnline) {
     throw new AppEror(httStatus.BAD_REQUEST, "Driver must be online.");
   }
+  if (driver?.isBlocked) {
+    throw new AppEror(httStatus.BAD_REQUEST, "Driver is blocked by admin.");
+  }
 
   const activeRide = await Ride.findOne({
     driver: req.user!.userId,
     status: { $nin: [RideStatus.COMPLETED, RideStatus.CANCELED] },
   });
+
   if (activeRide) {
     throw new AppEror(
       httStatus.BAD_REQUEST,
