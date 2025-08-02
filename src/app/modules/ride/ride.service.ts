@@ -9,7 +9,26 @@ import { Ride } from "./ride.model";
 
 const requestRide = async (req: any, payload: Partial<IRequestRide>) => {
   const { pickup, destination } = payload;
-  //   console.log(req.user);
+  const userId = req.user?.userId;
+
+  const exisingRide = await Ride.findOne({
+    rider: userId,
+    status: {
+      $in: [
+        RideStatus.ACCEPTED,
+        RideStatus.IN_TRANSIT,
+        RideStatus.PICKED_UP,
+        RideStatus.REQUESTED,
+      ],
+    },
+  });
+
+  if (exisingRide) {
+    throw new AppEror(
+      httStatus.BAD_REQUEST,
+      "You already have an active ride. Complete or cancel it before requesting a new one."
+    );
+  }
   const ride = await Ride.create({
     rider: req.user?.userId,
     pickup,
